@@ -173,3 +173,32 @@ impl ::std::borrow::Borrow<IriStr> for IriString {
         unsafe { <IriStr as OpaqueTypedefUnsized>::from_inner_unchecked(&self.0) }
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn ensure_ok(s: &str) {
+        let iri = Iri::new(s).unwrap();
+        let iri_str = IriStr::new(s).unwrap();
+        let iri_string = IriString::new(s.to_owned()).unwrap();
+        // Compare URLs.
+        assert_eq!(s, iri.raw());
+        assert_eq!(iri.resolved(), &Url::parse(iri.raw()).unwrap());
+        // Compare `IriStr`s.
+        assert_eq!(iri_string.as_iri_str(), iri_str);
+        assert_eq!(iri_string.as_iri_str().to_owned(), iri_string);
+    }
+
+    #[test]
+    fn ok_cases() {
+        let ok_cases = [
+            "https://example.com/",
+            "https://example.com/テスト",
+            "https://example.com/%e3%83%86ス%E3%83%88",
+            "https://テスト.日本語/%E3%83%86%E3%82%B9%E3%83%88",
+        ];
+        ok_cases.into_iter().for_each(|&s| ensure_ok(s));
+    }
+}
