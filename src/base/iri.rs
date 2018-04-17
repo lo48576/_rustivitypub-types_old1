@@ -1,6 +1,8 @@
 //! IRI and URI types.
 
 use opaque_typedef::{OpaqueTypedef, OpaqueTypedefUnsized};
+use serde;
+use serde::{Deserialize, Deserializer};
 pub use url::ParseError as UrlParseError;
 pub use url::Url;
 
@@ -52,7 +54,7 @@ fn validate_iri_str<S: AsRef<str>>(s: S) -> Result<S, UrlParseError> {
 
 
 /// IRI string slice.
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, OpaqueTypedefUnsized)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, OpaqueTypedefUnsized, Serialize)]
 #[repr(C)]
 #[opaque_typedef(
     derive(
@@ -118,9 +120,19 @@ impl ToOwned for IriStr {
     }
 }
 
+impl<'de> Deserialize<'de> for &'de IriStr {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = <&str>::deserialize(deserializer)?;
+        IriStr::new(s).map_err(serde::de::Error::custom)
+    }
+}
+
 
 /// Owned IRI string.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, OpaqueTypedef)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, OpaqueTypedef, Serialize)]
 #[opaque_typedef(
     derive(
         AsRef(Deref, Inner),
@@ -171,6 +183,16 @@ impl IriString {
 impl ::std::borrow::Borrow<IriStr> for IriString {
     fn borrow(&self) -> &IriStr {
         unsafe { <IriStr as OpaqueTypedefUnsized>::from_inner_unchecked(&self.0) }
+    }
+}
+
+impl<'de> Deserialize<'de> for IriString {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = <String>::deserialize(deserializer)?;
+        IriString::new(s).map_err(serde::de::Error::custom)
     }
 }
 

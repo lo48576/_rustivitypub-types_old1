@@ -11,6 +11,8 @@ keywords = ["ActivityPub"]
 [dependencies]
 opaque_typedef = "^0.0.2"
 opaque_typedef_macros = "^0.0.2"
+serde = "^1.0"
+serde_derive = "^1.0"
 url = "^1.7"
 
 [badges]
