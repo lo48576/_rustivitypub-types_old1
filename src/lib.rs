@@ -1,6 +1,8 @@
 //! Type definitions for rustivitypub.
 #![warn(missing_docs)]
+#![feature(try_from)]
 
+extern crate chrono;
 extern crate opaque_typedef;
 #[macro_use]
 extern crate opaque_typedef_macros;
