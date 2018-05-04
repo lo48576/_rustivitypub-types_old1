@@ -1,9 +1,9 @@
 language: rust
 cache: cargo
 rust:
-  # Uncomment to enable `stable` when 1.26.0 become stable.
+  # Uncomment to enable `stable` and `beta` when `TryFrom` become stable.
   #- stable
-  - beta
+  #- beta
   - nightly
 matrix:
   allow_failures:
